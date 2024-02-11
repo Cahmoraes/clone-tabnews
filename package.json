@@ -4,7 +4,9 @@
   "description": "Implementação do tabnews.com.br do curso.dev",
   "main": "index.js",
   "scripts": {
-    "dev": "npx next dev"
+    "dev": "npx next dev",
+    "lint:check": "npx prettier --check .",
+    "lint:fix": "npx prettier --write ."
   },
   "keywords": [],
   "author": "",
@@ -13,5 +15,8 @@
     "next": "^13.1.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
   }
 }
