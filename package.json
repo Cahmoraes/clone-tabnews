@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "npx next dev",
     "lint:check": "npx prettier --check .",
-    "lint:fix": "npx prettier --write ."
+    "lint:fix": "npx prettier --write .",
+    "test": "npx vitest",
+    "test:run": "npx vitest --run"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +19,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "prettier": "^3.2.5"
+    "prettier": "^3.2.5",
+    "vitest": "^1.2.2"
   }
 }
