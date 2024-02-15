@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": ".a",
+    "baseUrl": ".",
     "types": ["vitest/globals"]
   }
 }
