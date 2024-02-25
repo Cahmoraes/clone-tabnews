@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Implementação do tabnews.com.br do curso.dev",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "dev": "npm run services:up && npx next dev",
     "services:up": "docker compose -f infra/compose.yaml up -d",
@@ -12,13 +11,18 @@
     "lint:check": "npx prettier --check .",
     "lint:fix": "npx prettier --write .",
     "test": "npx vitest",
-    "test:run": "npx vitest --run"
+    "test:run": "npx vitest --run",
+    "migration:create": "npx node-pg-migrate -m infra/migrations create",
+    "migration:up": "npx node-pg-migrate -m infra/migrations up --envPath .env.development",
+    "migration:down": "npx node-pg-migrate -m infra/migrations down --envPath .env.development"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "dotenv": "^16.4.4",
     "next": "^13.1.6",
+    "node-pg-migrate": "^6.2.2",
     "pg": "^8.11.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
