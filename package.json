@@ -10,7 +10,7 @@
     "services:stop": "docker compose -f infra/compose.yaml stop",
     "lint:check": "npx prettier --check .",
     "lint:fix": "npx prettier --write .",
-    "test": "npx vitest",
+    "test": "npm run services:up && concurrently -n next,vitest --hide next -k -s command-vitest \"next dev\" \"npx vitest --run\"",
     "test:run": "npx vitest --run",
     "migration:create": "npx node-pg-migrate -m infra/migrations create",
     "migration:up": "npx node-pg-migrate -m infra/migrations up --envPath .env.development",
@@ -21,6 +21,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "async-retry": "^1.3.3",
     "dotenv": "^16.4.4",
     "dotenv-expand": "^11.0.6",
     "next": "^13.1.6",
@@ -30,6 +31,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "concurrently": "8.2.2",
     "prettier": "^3.2.5",
     "vitest": "^1.2.2"
   }
