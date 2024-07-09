@@ -10,6 +10,7 @@
     "services:stop": "docker compose -f infra/compose.yaml stop",
     "lint:prettier:check": "npx prettier --check .",
     "lint:prettier:fix": "npx prettier --write .",
+    "lint:eslint:check": "next lint --dir .",
     "test": "npm run services:up && concurrently -n next,vitest --hide next -k -s command-vitest \"next dev\" \"npx vitest --run\"",
     "test:run": "npx vitest --run",
     "migration:create": "npx node-pg-migrate -m infra/migrations create",
@@ -32,6 +33,10 @@
   },
   "devDependencies": {
     "concurrently": "8.2.2",
+    "eslint": "8.57.0",
+    "eslint-config-next": "14.2.4",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-vitest-globals": "^1.5.0",
     "prettier": "^3.2.5",
     "vitest": "^1.2.2"
   }

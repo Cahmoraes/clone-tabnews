@@ -27,10 +27,12 @@ async function getNewClient() {
   return client;
 }
 
-export default {
+const database = {
   query,
   getNewClient,
 };
+
+export default database;
 
 function sslValues() {
   return process.env.NODE_ENV === "production" ? true : false;

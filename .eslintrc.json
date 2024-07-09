@@ -1,0 +1,11 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "next/core-web-vitals",
+    "plugin:vitest-globals/recommended",
+    "prettier"
+  ],
+  "env": {
+    "vitest-globals/env": true
+  }
+}
