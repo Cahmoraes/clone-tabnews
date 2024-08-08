@@ -16,7 +16,8 @@
     "migration:create": "npx node-pg-migrate -m infra/migrations create",
     "migration:up": "npx node-pg-migrate -m infra/migrations up --envPath .env.development",
     "migration:down": "npx node-pg-migrate -m infra/migrations down --envPath .env.development",
-    "wait-for-postgres": "node infra/scripts/wait-for-postgres.js"
+    "wait-for-postgres": "node infra/scripts/wait-for-postgres.js",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
@@ -39,6 +40,7 @@
     "eslint-config-next": "14.2.4",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-vitest-globals": "^1.5.0",
+    "husky": "^9.1.4",
     "prettier": "^3.2.5",
     "vitest": "^1.2.2"
   }
