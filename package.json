@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "npm run services:up && npm run services:wait:database && npm run migration:up && npx next dev",
+    "test": "npm run services:up && concurrently -n next,vitest --hide next -k -s command-vitest \"next dev\" \"npx vitest --run\"",
+    "test:run": "npx vitest --run",
     "services:up": "docker compose -f infra/compose.yaml up -d",
     "services:down": "docker compose -f infra/compose.yaml down",
     "services:wait:database": "node infra/scripts/wait-for-postgres.js",
@@ -14,8 +16,6 @@
     "lint:prettier:check": "npx prettier --check .",
     "lint:prettier:fix": "npx prettier --write .",
     "lint:eslint:check": "next lint --dir .",
-    "test": "npm run services:up && concurrently -n next,vitest --hide next -k -s command-vitest \"next dev\" \"npx vitest --run\"",
-    "test:run": "npx vitest --run",
     "migrations:down": "npx node-pg-migrate -m infra/migrations down --envPath .env.development",
     "prepare": "husky",
     "commit": "cz"
