@@ -46,6 +46,7 @@
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-vitest-globals": "1.5.0",
     "husky": "9.1.5",
+    "lint-staged": "^15.2.10",
     "prettier": "3.3.3",
     "vitest": "1.2.2"
   },
@@ -53,5 +54,11 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx,js,jsx,json,css,scss,md}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }
