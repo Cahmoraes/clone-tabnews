@@ -9,6 +9,6 @@ export default defineConfig({
         singleThread: true,
       },
     },
-    setupFiles: ["./tests/setup/config-environment.ts"],
+    setupFiles: ["./tests/setup/config-environment.js"],
   },
 });
