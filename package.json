@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "npm run services:up && npm run services:wait:database && npm run migrations:up && npx next dev",
     "test": "npm run services:up && concurrently -n next,vitest --hide next -k -s command-vitest \"next dev\" \"npx vitest --run\"",
+    "test:watch": "npx vitest",
     "posttest": "npm run services:stop",
     "test:run": "npx vitest --run",
     "services:up": "docker compose -f infra/compose.yaml up -d",
