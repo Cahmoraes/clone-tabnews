@@ -7,10 +7,11 @@ async function query(queryObject) {
     const result = await client.query(queryObject);
     return result;
   } catch (error) {
+    console.log("\n Error dentro do catch do database.js");
     console.error(error);
     throw error;
   } finally {
-    await client.end();
+    await client?.end();
   }
 }
 
@@ -23,7 +24,7 @@ async function getNewClient() {
     password: process.env.POSTGRES_PASSWORD,
     ssl: sslValues(),
   });
-  await client.connect();
+  await client?.connect();
   return client;
 }
 
