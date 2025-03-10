@@ -9,21 +9,21 @@ exports.shorthands = undefined;
  * @returns {Promise<void> | void}
  */
 exports.up = (pgm) => {
-  pgm.createTable('users', {
+  pgm.createTable("users", {
     id: {
-      type: 'uuid',
+      type: "uuid",
       primaryKey: true,
-      default: pgm.func('gen_random_uuid()'),
+      default: pgm.func("gen_random_uuid()"),
     },
     // For reference, Github limits usernames to 39 characters.
     username: {
-      type: 'varchar(30)',
+      type: "varchar(30)",
       notNull: true,
       unique: true,
     },
     // Why 254 in length? https://security.stackexchange.com/a/39851
     email: {
-      type: 'varchar(254)',
+      type: "varchar(254)",
       notNull: true,
       unique: true,
     },
