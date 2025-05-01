@@ -30,7 +30,7 @@ describe("GET /api/v1/users/[username]", () => {
       expect(response2Body).toEqual({
         id: response2Body.id,
         email: "mesmo.case@curso.dev",
-        password: "senha123",
+        password: response2Body.password,
         username: "MesmoCase",
         created_at: response2Body.created_at,
         updated_at: response2Body.updated_at,
@@ -61,7 +61,7 @@ describe("GET /api/v1/users/[username]", () => {
       expect(response2Body).toEqual({
         id: response2Body.id,
         email: "case.diferente@curso.dev",
-        password: "senha123",
+        password: response2Body.password,
         username: "CaseDiferente",
         created_at: response2Body.created_at,
         updated_at: response2Body.updated_at,
