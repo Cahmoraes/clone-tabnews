@@ -34,12 +34,12 @@ describe("GET /api/v1/users/[username]", () => {
       expect(Date.parse(response2Body.updated_at)).not.toBeNaN();
     });
 
-    test("With case mismatch", async () => {     
+    test("With case mismatch", async () => {
       await orchestrator.createUser({
         username: "CaseDiferente",
         email: "case.diferente@curso.dev",
         password: "senha123",
-      })
+      });
       const response2 = await fetch(
         "http://localhost:3000/api/v1/users/casediferente",
       );
