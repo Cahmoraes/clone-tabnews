@@ -34,7 +34,6 @@ async function getHandler(request, response) {
  * @returns {Promise<void>} - A promise that resolves when the response is sent.
  */
 async function patchHandler(request, response) {
-  console.log("aqui");
   const username = request.query.username;
   const userInputValues = request.body;
   const updatedUser = await user.update(username, userInputValues);
