@@ -54,7 +54,7 @@ async function createUser(userObject = {}) {
  * @returns {Promise<Object>} A promise that resolves to the created session object
  */
 async function createSession(userId) {
-  return await session.create(userId);
+  return session.create(userId);
 }
 
 const orchestrator = {
