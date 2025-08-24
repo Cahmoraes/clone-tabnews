@@ -22,7 +22,6 @@ async function postHandler(request, response) {
 }
 
 async function deleteHandler(request, response) {
-  console.log("deleteHandler ********");
   const sessionToken = request.cookies.session_id;
   const sessionObject = await session.findOneValidByToken(sessionToken);
   const expiredSession = await session.expireById(sessionObject.id);

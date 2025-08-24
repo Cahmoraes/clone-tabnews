@@ -21,10 +21,40 @@ async function waitForAllServices() {
   }
 }
 
+/**
+ * Drop and recreate the "public" schema on the connected database.
+ *
+ * This is a destructive operation intended for test/orchestration environments:
+ * it removes all objects (tables, sequences, functions, types, etc.) in the
+ * "public" schema and then creates a fresh, empty "public" schema.
+ *
+ * Use with caution — do not run against production databases.
+ *
+ * @async
+ * @function clearDatabase
+ * @returns {Promise<void>} Resolves when the schema has been dropped and recreated.
+ * @throws {Error} If the underlying database query fails.
+ */
 async function clearDatabase() {
   await database.query("drop schema public cascade; create schema public;");
 }
 
+/**
+ * Runs all pending migrations using the configured migrator.
+ *
+ * This asynchronous helper delegates to `migrator.runPendingMigrations()` and
+ * resolves when all pending migrations have been executed. Running this may
+ * modify the application's persistent state (for example, database schema or data).
+ *
+ * @async
+ * @function runPendingMigrations
+ * @returns {Promise<void>} Resolves when migrations complete.
+ * @throws {Error} If migration execution fails, the promise will reject with the underlying error.
+ *
+ * @example
+ * // Ensure migrations are applied before starting the app
+ * await runPendingMigrations();
+ */
 async function runPendingMigrations() {
   await migrator.runPendingMigrations();
 }
