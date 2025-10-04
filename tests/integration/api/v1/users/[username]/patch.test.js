@@ -114,7 +114,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         email: "uniqueUser1@curso.dev",
-        features: [],
+        features: ["read:activation_token"],
         password: responseBody.password,
         username: "uniqueUser2",
         created_at: responseBody.created_at,
@@ -158,7 +158,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         email: "uniqueUser2@curso.dev",
-        features: [],
+        features: ["read:activation_token"],
         password: responseBody.password,
         username: "uniqueEmail1",
         created_at: responseBody.created_at,
@@ -202,7 +202,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         email: "newPassword1@curso.dev",
-        features: [],
+        features: ["read:activation_token"],
         password: responseBody.password,
         username: "newPassword1",
         created_at: responseBody.created_at,
