@@ -1,11 +1,29 @@
-import { Client } from "pg";
+import { Pool } from "pg";
 import { ServiceError } from "./errors";
 
+let pool;
+
+function getPool() {
+  if (!pool) {
+    pool = new Pool({
+      host: process.env.POSTGRES_HOST,
+      port: process.env.POSTGRES_PORT,
+      user: process.env.POSTGRES_USER,
+      database: process.env.POSTGRES_DB,
+      password: process.env.POSTGRES_PASSWORD,
+      ssl: sslValues(),
+      max: 20, // máximo de conexões simultâneas
+      idleTimeoutMillis: 30000, // fecha conexões ociosas após 30s
+      connectionTimeoutMillis: 2000, // timeout para obter conexão do pool
+    });
+  }
+  return pool;
+}
+
 async function query(queryObject) {
-  let client;
   try {
-    client = await getNewClient();
-    const result = await client.query(queryObject);
+    const pool = getPool();
+    const result = await pool.query(queryObject);
     return result;
   } catch (error) {
     const serviceErrorObject = new ServiceError({
@@ -13,21 +31,12 @@ async function query(queryObject) {
       cause: error,
     });
     throw serviceErrorObject;
-  } finally {
-    await client?.end();
   }
 }
 
 async function getNewClient() {
-  const client = new Client({
-    host: process.env.POSTGRES_HOST,
-    port: process.env.POSTGRES_PORT,
-    user: process.env.POSTGRES_USER,
-    database: process.env.POSTGRES_DB,
-    password: process.env.POSTGRES_PASSWORD,
-    ssl: sslValues(),
-  });
-  await client?.connect();
+  const pool = getPool();
+  const client = await pool.connect();
   return client;
 }
 
