@@ -4,6 +4,7 @@ import migrator from "models/migrator";
 import user from "models/user";
 import { faker } from "@faker-js/faker";
 import session from "models/session";
+import { activation } from "models/activation";
 
 const EMAIL_HTTP_URL = `http://${process.env.EMAIL_HTTP_HOST}:${process.env.EMAIL_HTTP_PORT}`;
 
@@ -157,11 +158,36 @@ async function getLastEmail() {
   return lastEmailItem;
 }
 
+/**
+ * Extracts a UUID (Universally Unique Identifier) from a given text string.
+ *
+ * @param {string} text - The text string to search for a UUID pattern
+ * @returns {string|null} The first UUID found in the text, or null if no UUID is found
+ *
+ * @example
+ * // Returns "123e4567-e89b-12d3-a456-426614174000"
+ * extractUUID("User ID: 123e4567-e89b-12d3-a456-426614174000");
+ *
+ * @example
+ * // Returns null
+ * extractUUID("No UUID in this text");
+ */
 function extractUUID(text) {
   const match = text.match(
     /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i,
   );
   return match ? match[0] : null;
+}
+
+/**
+ * Activates the given inactive user by delegating to activation.activateUserByUserId.
+ *
+ * @async
+ * @param {{id: string|number}} inactiveUser - Object containing the user's id to activate.
+ * @returns {Promise<unknown>} Promise that resolves with the result of the activation call.
+ */
+async function activateUser(inactiveUser) {
+  return activation.activateUserByUserId(inactiveUser.id);
 }
 
 const orchestrator = {
@@ -173,6 +199,7 @@ const orchestrator = {
   deleteAllEmails,
   getLastEmail,
   extractUUID,
+  activateUser,
 };
 
 export default orchestrator;

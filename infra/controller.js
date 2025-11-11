@@ -10,6 +10,7 @@ import {
   ForbiddenError,
 } from "./errors";
 import user from "models/user";
+import { authorization } from "models/authorization";
 
 function onNoMatchHandler(request, response) {
   const publicErrorObject = new MethodNotAllowedError();
@@ -87,10 +88,23 @@ function injectAnonymousUser(request) {
   };
 }
 
+/**
+ * Creates a middleware function that checks if a user has permission to access a specific feature.
+ *
+ * @param {string} feature - The feature name to check authorization for
+ * @returns {Function} An Express middleware function that validates user permissions
+ * @throws {ForbiddenError} When the user doesn't have permission for the specified feature
+ *
+ * @example
+ * // Usage in an Express route
+ * app.get('/admin', canRequest('admin_access'), (req, res) => {
+ *   res.json({ message: 'Admin panel' });
+ * });
+ */
 function canRequest(feature) {
-  return async (request, response, next) => {
+  return async function canRequestMiddleware(request, _response, next) {
     const userTryingToRequest = request.context.user;
-    if (userTryingToRequest.features.includes(feature)) {
+    if (authorization.can(userTryingToRequest, feature)) {
       return next();
     }
     throw new ForbiddenError({
