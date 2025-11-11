@@ -1,8 +1,9 @@
 import database from "infra/database";
 import { email } from "infra/email";
-import { NotFoundError } from "infra/errors";
+import { ForbiddenError, NotFoundError } from "infra/errors";
 import { webserver } from "infra/webserver";
 import user from "./user";
+import { authorization } from "./authorization";
 
 const EXPIRATION_IN_MILLISECONDS = 1000 * 60 * 15; // 15 minutos
 
@@ -94,7 +95,28 @@ async function markTokenAsUsed(activationTokenId) {
   }
 }
 
+/**
+ * Activate a user by their user ID.
+ *
+ * This function finds the user by ID, verifies the user is allowed to use an activation token,
+ * and updates the user's features to grant session-related permissions ("create:session",
+ * "read:session").
+ *
+ * @async
+ * @function activateUserByUserId
+ * @param {string|number} userId - The identifier of the user to activate.
+ * @returns {Promise<Object>} A promise that resolves to the updated user object with the new features.
+ * @throws {ForbiddenError} If the user is not allowed to use activation tokens (authorization.cannot check fails).
+ * @throws {Error} If the user cannot be found or if a database/operation error occurs.
+ */
 async function activateUserByUserId(userId) {
+  const userToActive = await user.findOneById(userId);
+  if (authorization.cannot(userToActive, "read:activation_token")) {
+    throw new ForbiddenError({
+      message: "Você nao pode mais utilizar tokens de ativação.",
+      action: "Entre em contato com o suporte",
+    });
+  }
   const activatedUser = await user.setFeatures(userId, [
     "create:session",
     "read:session",
@@ -108,4 +130,5 @@ export const activation = {
   findOneValidById,
   markTokenAsUsed,
   activateUserByUserId,
+  EXPIRATION_IN_MILLISECONDS,
 };
