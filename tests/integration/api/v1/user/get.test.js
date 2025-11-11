@@ -15,6 +15,7 @@ describe("GET /api/v1/user", () => {
       const createdUser = await orchestrator.createUser({
         username: "UserWithValidSession",
       });
+      const activatedUser = await orchestrator.activateUser(createdUser);
       const sessionObject = await orchestrator.createSession(createdUser.id);
       const response = await fetch("http://localhost:3000/api/v1/user", {
         headers: {
@@ -31,10 +32,10 @@ describe("GET /api/v1/user", () => {
         id: createdUser.id,
         username: "UserWithValidSession",
         email: createdUser.email,
-        features: ["read:activation_token"],
+        features: ["create:session", "read:session"],
         password: createdUser.password,
         created_at: new Date(createdUser.created_at).toISOString(),
-        updated_at: new Date(createdUser.updated_at).toISOString(),
+        updated_at: new Date(activatedUser.updated_at).toISOString(),
       });
       expect(uuidVersion(responseBody.id)).toBe(4);
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
