@@ -7,11 +7,11 @@
  * @returns {boolean} True if the user's features include the specified feature, otherwise false.
  */
 function can(user, feature) {
-  let authorized = false;
-  if (user.features.includes(feature)) {
-    authorized = true;
-  }
-  return authorized;
+	let authorized = false
+	if (user.features.includes(feature)) {
+		authorized = true
+	}
+	return authorized
 }
 
 /**
@@ -25,10 +25,10 @@ function can(user, feature) {
  * @see can
  */
 function cannot(user, feature) {
-  return !can(user, feature);
+	return !can(user, feature)
 }
 
 export const authorization = {
-  can,
-  cannot,
-};
+	can,
+	cannot,
+}

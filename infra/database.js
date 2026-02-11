@@ -1,7 +1,7 @@
-import { Pool } from "pg";
-import { ServiceError } from "./errors";
+import { Pool } from "pg"
+import { ServiceError } from "./errors"
 
-let pool;
+let pool
 
 function getPool() {
 	if (!pool) {
@@ -15,38 +15,38 @@ function getPool() {
 			max: 20, // máximo de conexões simultâneas
 			idleTimeoutMillis: 30000, // fecha conexões ociosas após 30s
 			connectionTimeoutMillis: 2000, // timeout para obter conexão do pool
-		});
+		})
 	}
-	return pool;
+	return pool
 }
 
 async function query(queryObject) {
 	try {
-		const pool = getPool();
-		const result = await pool.query(queryObject);
-		return result;
+		const pool = getPool()
+		const result = await pool.query(queryObject)
+		return result
 	} catch (error) {
 		const serviceErrorObject = new ServiceError({
 			message: "Erro na conexão com Banco ou na Query",
 			cause: error,
-		});
-		throw serviceErrorObject;
+		})
+		throw serviceErrorObject
 	}
 }
 
 async function getNewClient() {
-	const pool = getPool();
-	const client = await pool.connect();
-	return client;
+	const pool = getPool()
+	const client = await pool.connect()
+	return client
 }
 
 const database = {
 	query,
 	getNewClient,
-};
+}
 
-export default database;
+export default database
 
 function sslValues() {
-	return process.env.NODE_ENV === "production" ? true : false;
+	return process.env.NODE_ENV === "production"
 }

@@ -1,18 +1,18 @@
-import { createRouter } from "next-connect";
-import { controller } from "infra/controller";
-import user from "models/user";
-import { activation } from "models/activation";
+import { controller } from "infra/controller"
+import { activation } from "models/activation"
+import user from "models/user"
+import { createRouter } from "next-connect"
 
-const router = createRouter();
+const router = createRouter()
 
-router.post(postHandler);
+router.post(postHandler)
 
-export default router.handler(controller.errorHandlers);
+export default router.handler(controller.errorHandlers)
 
 async function postHandler(request, response) {
-  const userInputValues = request.body;
-  const newUser = await user.create(userInputValues);
-  const activationToken = await activation.create(newUser.id);
-  await activation.sendEmailToUser(newUser, activationToken);
-  return response.status(201).json(newUser);
+	const userInputValues = request.body
+	const newUser = await user.create(userInputValues)
+	const activationToken = await activation.create(newUser.id)
+	await activation.sendEmailToUser(newUser, activationToken)
+	return response.status(201).json(newUser)
 }

@@ -1,13 +1,13 @@
-import { createRouter } from "next-connect";
-import { controller } from "infra/controller";
-import user from "models/user";
+import { controller } from "infra/controller"
+import user from "models/user"
+import { createRouter } from "next-connect"
 
-const router = createRouter();
+const router = createRouter()
 
-router.get(getHandler);
-router.patch(patchHandler);
+router.get(getHandler)
+router.patch(patchHandler)
 
-export default router.handler(controller.errorHandlers);
+export default router.handler(controller.errorHandlers)
 
 /**
  * Handles GET requests to retrieve user information by username.
@@ -19,9 +19,9 @@ export default router.handler(controller.errorHandlers);
  * @returns {Promise<void>} - A promise that resolves when the response is sent.
  */
 async function getHandler(request, response) {
-  const username = request.query.username;
-  const userFound = await user.findOneByUsername(username);
-  return response.status(200).json(userFound);
+	const username = request.query.username
+	const userFound = await user.findOneByUsername(username)
+	return response.status(200).json(userFound)
 }
 
 /**
@@ -34,8 +34,8 @@ async function getHandler(request, response) {
  * @returns {Promise<void>} - A promise that resolves when the response is sent.
  */
 async function patchHandler(request, response) {
-  const username = request.query.username;
-  const userInputValues = request.body;
-  const updatedUser = await user.update(username, userInputValues);
-  return response.status(200).json(updatedUser);
+	const username = request.query.username
+	const userInputValues = request.body
+	const updatedUser = await user.update(username, userInputValues)
+	return response.status(200).json(updatedUser)
 }

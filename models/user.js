@@ -1,6 +1,6 @@
-import database from "infra/database";
-import { NotFoundError, ValidationError } from "infra/errors";
-import password from "models/password";
+import database from "infra/database"
+import { NotFoundError, ValidationError } from "infra/errors"
+import password from "models/password"
 
 /**
  * Finds a user by their ID in the database.
@@ -11,8 +11,8 @@ import password from "models/password";
  * @async
  */
 async function findOneById(id) {
-	const userFound = await runSelectQuery(id);
-	return userFound;
+	const userFound = await runSelectQuery(id)
+	return userFound
 
 	async function runSelectQuery(id) {
 		const results = await database.query({
@@ -27,14 +27,14 @@ async function findOneById(id) {
           1
         ;`,
 			values: [id],
-		});
+		})
 		if (results.rowCount === 0) {
 			throw new NotFoundError({
 				message: "O id informado não foi encontrado no sistema.",
 				action: "Verifique se o id esta digitado corretamente.",
-			});
+			})
 		}
-		return results.rows[0];
+		return results.rows[0]
 	}
 }
 
@@ -43,8 +43,8 @@ async function findOneById(id) {
  * @param {String} username
  */
 async function findOneByUsername(username) {
-	const userFound = await runSelectQuery(username);
-	return userFound;
+	const userFound = await runSelectQuery(username)
+	return userFound
 
 	async function runSelectQuery(username) {
 		const results = await database.query({
@@ -59,14 +59,14 @@ async function findOneByUsername(username) {
           1
         ;`,
 			values: [username],
-		});
+		})
 		if (results.rowCount === 0) {
 			throw new NotFoundError({
 				message: "O username informado não foi encontrado no sistema.",
 				action: "Verifique se o username esta digitado corretamente.",
-			});
+			})
 		}
-		return results.rows[0];
+		return results.rows[0]
 	}
 }
 
@@ -75,8 +75,8 @@ async function findOneByUsername(username) {
  * @param {String} email
  */
 async function findOneByEmail(email) {
-	const userFound = await runSelectQuery(email);
-	return userFound;
+	const userFound = await runSelectQuery(email)
+	return userFound
 
 	async function runSelectQuery(email) {
 		const results = await database.query({
@@ -91,24 +91,24 @@ async function findOneByEmail(email) {
           1
         ;`,
 			values: [email],
-		});
+		})
 		if (results.rowCount === 0) {
 			throw new NotFoundError({
 				message: "O email informado não foi encontrado no sistema.",
 				action: "Verifique se o email esta digitado corretamente.",
-			});
+			})
 		}
-		return results.rows[0];
+		return results.rows[0]
 	}
 }
 
 async function create(userInputValues) {
-	await validateUniqueUsername(userInputValues.username);
-	await validateUniqueEmail(userInputValues.email);
-	await hashPasswordInObject(userInputValues);
-	injectDefaultFeaturesInObject(userInputValues);
-	const newUser = await runInsertQuery(userInputValues);
-	return newUser;
+	await validateUniqueUsername(userInputValues.username)
+	await validateUniqueEmail(userInputValues.email)
+	await hashPasswordInObject(userInputValues)
+	injectDefaultFeaturesInObject(userInputValues)
+	const newUser = await runInsertQuery(userInputValues)
+	return newUser
 
 	async function runInsertQuery(userInputValues) {
 		const result = await database.query({
@@ -126,12 +126,12 @@ async function create(userInputValues) {
 				userInputValues.password,
 				userInputValues.features,
 			],
-		});
-		return result.rows[0];
+		})
+		return result.rows[0]
 	}
 
 	function injectDefaultFeaturesInObject(userInputValues) {
-		userInputValues.features = ["read:activation_token"];
+		userInputValues.features = ["read:activation_token"]
 	}
 }
 
@@ -147,24 +147,24 @@ async function create(userInputValues) {
  * @param {UserInputValues} userInputValues
  */
 async function update(username, userInputValues) {
-	const currentUser = await findOneByUsername(username);
+	const currentUser = await findOneByUsername(username)
 	if (hasProperty("username")) {
-		await validateUniqueUsername(userInputValues.username);
+		await validateUniqueUsername(userInputValues.username)
 	}
 	if (hasProperty("email")) {
-		await validateUniqueEmail(userInputValues.email);
+		await validateUniqueEmail(userInputValues.email)
 	}
 	if (hasProperty("password")) {
-		await hashPasswordInObject(userInputValues);
+		await hashPasswordInObject(userInputValues)
 	}
 	const userWithNewValues = {
 		...currentUser,
 		...userInputValues,
-	};
-	return runUpdateQuery(userWithNewValues);
+	}
+	return runUpdateQuery(userWithNewValues)
 
 	function hasProperty(property) {
-		return userInputValues && Reflect.has(userInputValues, property);
+		return userInputValues && Reflect.has(userInputValues, property)
 	}
 
 	async function runUpdateQuery(userWithNewValues) {
@@ -188,8 +188,8 @@ async function update(username, userInputValues) {
 				userWithNewValues.email,
 				userWithNewValues.password,
 			],
-		});
-		return result.rows[0];
+		})
+		return result.rows[0]
 	}
 }
 
@@ -204,12 +204,12 @@ async function validateUniqueUsername(username) {
         LOWER(username) = LOWER($1)
       ;`,
 		values: [username],
-	});
+	})
 	if (results.rowCount > 0) {
 		throw new ValidationError({
 			message: "O username informado já está sendo utilizado.",
 			action: "Utilize outro username para realizar esta operação.",
-		});
+		})
 	}
 }
 
@@ -224,23 +224,23 @@ async function validateUniqueEmail(email) {
         LOWER(email) = LOWER($1)
       ;`,
 		values: [email],
-	});
+	})
 	if (results.rowCount > 0) {
 		throw new ValidationError({
 			message: "O e-mail já está sendo utilizado.",
 			action: "Utilize outro e-mail para realizar esta operação.",
-		});
+		})
 	}
 }
 
 async function hashPasswordInObject(userInputValues) {
-	const hashedPassword = await password.hash(userInputValues.password);
-	userInputValues.password = hashedPassword;
+	const hashedPassword = await password.hash(userInputValues.password)
+	userInputValues.password = hashedPassword
 }
 
 async function setFeatures(userId, features) {
-	const updatedUser = await runUpdateQuery(userId, features);
-	return updatedUser;
+	const updatedUser = await runUpdateQuery(userId, features)
+	return updatedUser
 
 	async function runUpdateQuery(userId, features) {
 		const results = await database.query({
@@ -256,8 +256,8 @@ async function setFeatures(userId, features) {
           *
       `,
 			values: [userId, features],
-		});
-		return results.rows[0];
+		})
+		return results.rows[0]
 	}
 }
 
@@ -268,6 +268,6 @@ const user = {
 	findOneByEmail,
 	update,
 	setFeatures,
-};
+}
 
-export default user;
+export default user

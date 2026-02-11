@@ -1,40 +1,40 @@
-import retry from "async-retry";
-import database from "infra/database";
-import migrator from "models/migrator";
-import user from "models/user";
-import { faker } from "@faker-js/faker";
-import session from "models/session";
-import { activation } from "models/activation";
+import { faker } from "@faker-js/faker"
+import retry from "async-retry"
+import database from "infra/database"
+import { activation } from "models/activation"
+import migrator from "models/migrator"
+import session from "models/session"
+import user from "models/user"
 
-const EMAIL_HTTP_URL = `http://${process.env.EMAIL_HTTP_HOST}:${process.env.EMAIL_HTTP_PORT}`;
+const EMAIL_HTTP_URL = `http://${process.env.EMAIL_HTTP_HOST}:${process.env.EMAIL_HTTP_PORT}`
 
 async function waitForAllServices() {
-  await waitForWebServer();
-  await waitForEmailServer();
+	await waitForWebServer()
+	await waitForEmailServer()
 
-  async function waitForWebServer() {
-    return retry(fetchStatusPage, {
-      retries: 100,
-      maxTimeout: 1000,
-    });
+	async function waitForWebServer() {
+		return retry(fetchStatusPage, {
+			retries: 100,
+			maxTimeout: 1000,
+		})
 
-    async function fetchStatusPage() {
-      const response = await fetch("http://localhost:3000/api/v1/status");
-      if (response.status !== 200) throw new Error();
-    }
-  }
+		async function fetchStatusPage() {
+			const response = await fetch("http://localhost:3000/api/v1/status")
+			if (response.status !== 200) throw new Error()
+		}
+	}
 
-  async function waitForEmailServer() {
-    return retry(fetchEmailPage, {
-      retries: 100,
-      maxTimeout: 1000,
-    });
+	async function waitForEmailServer() {
+		return retry(fetchEmailPage, {
+			retries: 100,
+			maxTimeout: 1000,
+		})
 
-    async function fetchEmailPage() {
-      const response = await fetch(EMAIL_HTTP_URL);
-      if (response.status !== 200) throw new Error();
-    }
-  }
+		async function fetchEmailPage() {
+			const response = await fetch(EMAIL_HTTP_URL)
+			if (response.status !== 200) throw new Error()
+		}
+	}
 }
 
 /**
@@ -52,7 +52,7 @@ async function waitForAllServices() {
  * @throws {Error} If the underlying database query fails.
  */
 async function clearDatabase() {
-  await database.query("drop schema public cascade; create schema public;");
+	await database.query("drop schema public cascade; create schema public;")
 }
 
 /**
@@ -72,7 +72,7 @@ async function clearDatabase() {
  * await runPendingMigrations();
  */
 async function runPendingMigrations() {
-  await migrator.runPendingMigrations();
+	await migrator.runPendingMigrations()
 }
 
 /**
@@ -86,12 +86,12 @@ async function runPendingMigrations() {
  * @returns {Promise<Object>} A promise that resolves to the created user object
  */
 async function createUser(userObject = {}) {
-  return user.create({
-    username:
-      userObject.username ?? faker.internet.username().replace(/[_.-]/g, ""),
-    email: userObject.email ?? faker.internet.email(),
-    password: userObject.password ?? "validPassword",
-  });
+	return user.create({
+		username:
+			userObject.username ?? faker.internet.username().replace(/[_.-]/g, ""),
+		email: userObject.email ?? faker.internet.email(),
+		password: userObject.password ?? "validPassword",
+	})
 }
 
 /**
@@ -100,7 +100,7 @@ async function createUser(userObject = {}) {
  * @returns {Promise<Object>} A promise that resolves to the created session object
  */
 async function createSession(userId) {
-  return session.create(userId);
+	return session.create(userId)
 }
 
 /**
@@ -122,9 +122,9 @@ async function createSession(userId) {
  * await deleteAllEmails();
  */
 async function deleteAllEmails() {
-  await fetch(`${EMAIL_HTTP_URL}/messages`, {
-    method: "DELETE",
-  });
+	await fetch(`${EMAIL_HTTP_URL}/messages`, {
+		method: "DELETE",
+	})
 }
 
 /**
@@ -146,16 +146,16 @@ async function deleteAllEmails() {
  * @throws {Error} If the message list is empty or if any network/fetch operation fails.
  */
 async function getLastEmail() {
-  const emailListResponse = await fetch(`${EMAIL_HTTP_URL}/messages`);
-  const emailListBody = await emailListResponse.json();
-  const lastEmailItem = emailListBody.pop();
-  if (!lastEmailItem) return null;
-  const emailTextResponse = await fetch(
-    `${EMAIL_HTTP_URL}/messages/${lastEmailItem.id}.plain`,
-  );
-  const emailTextBody = await emailTextResponse.text();
-  lastEmailItem.text = emailTextBody;
-  return lastEmailItem;
+	const emailListResponse = await fetch(`${EMAIL_HTTP_URL}/messages`)
+	const emailListBody = await emailListResponse.json()
+	const lastEmailItem = emailListBody.pop()
+	if (!lastEmailItem) return null
+	const emailTextResponse = await fetch(
+		`${EMAIL_HTTP_URL}/messages/${lastEmailItem.id}.plain`,
+	)
+	const emailTextBody = await emailTextResponse.text()
+	lastEmailItem.text = emailTextBody
+	return lastEmailItem
 }
 
 /**
@@ -173,10 +173,10 @@ async function getLastEmail() {
  * extractUUID("No UUID in this text");
  */
 function extractUUID(text) {
-  const match = text.match(
-    /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i,
-  );
-  return match ? match[0] : null;
+	const match = text.match(
+		/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i,
+	)
+	return match ? match[0] : null
 }
 
 /**
@@ -187,19 +187,19 @@ function extractUUID(text) {
  * @returns {Promise<unknown>} Promise that resolves with the result of the activation call.
  */
 async function activateUser(inactiveUser) {
-  return activation.activateUserByUserId(inactiveUser.id);
+	return activation.activateUserByUserId(inactiveUser.id)
 }
 
 const orchestrator = {
-  waitForAllServices,
-  clearDatabase,
-  runPendingMigrations,
-  createUser,
-  createSession,
-  deleteAllEmails,
-  getLastEmail,
-  extractUUID,
-  activateUser,
-};
+	waitForAllServices,
+	clearDatabase,
+	runPendingMigrations,
+	createUser,
+	createSession,
+	deleteAllEmails,
+	getLastEmail,
+	extractUUID,
+	activateUser,
+}
 
-export default orchestrator;
+export default orchestrator
