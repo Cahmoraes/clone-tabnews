@@ -136,13 +136,16 @@ describe("POST /api/v1/users", () => {
 					password: "senha123",
 				}),
 			})
-			expect(user2Response.status).toBe(403)
+			expect(user2Response.status).toBe(201)
 			const user2ResponseBody = await user2Response.json()
 			expect(user2ResponseBody).toEqual({
-				name: "ForbiddenError",
-				message: "Você não possui permissão para executar esta ação.",
-				action: 'Verifique se o seu usuário possui a feature: "create:user"',
-				status_code: 403,
+				id: user2ResponseBody.id,
+				email: "usuariologado@curso.dev",
+				features: ["read:activation_token"],
+				password: user2ResponseBody.password,
+				username: "usuariologado",
+				created_at: user2ResponseBody.created_at,
+				updated_at: user2ResponseBody.updated_at,
 			})
 		})
 	})
