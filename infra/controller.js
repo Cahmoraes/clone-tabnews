@@ -95,7 +95,7 @@ function injectAnonymousUser(request) {
  * @throws {ForbiddenError} When the user doesn't have permission for the specified feature
  *
  * @example
- * // Usage in an Express route
+ * Usage in an Express route
  * app.get('/admin', canRequest('admin_access'), (req, res) => {
  *   res.json({ message: 'Admin panel' });
  * });

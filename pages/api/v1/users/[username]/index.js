@@ -4,6 +4,7 @@ import { createRouter } from "next-connect"
 
 const router = createRouter()
 
+router.use(controller.injectAnonymousOrUser)
 router.get(getHandler)
 router.patch(patchHandler)
 
