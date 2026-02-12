@@ -31,7 +31,7 @@ async function findOneById(id) {
 		if (results.rowCount === 0) {
 			throw new NotFoundError({
 				message: "O id informado não foi encontrado no sistema.",
-				action: "Verifique se o id esta digitado corretamente.",
+				action: "Verifique se o id está digitado corretamente.",
 			})
 		}
 		return results.rows[0]
@@ -63,7 +63,7 @@ async function findOneByUsername(username) {
 		if (results.rowCount === 0) {
 			throw new NotFoundError({
 				message: "O username informado não foi encontrado no sistema.",
-				action: "Verifique se o username esta digitado corretamente.",
+				action: "Verifique se o username está digitado corretamente.",
 			})
 		}
 		return results.rows[0]
@@ -95,7 +95,7 @@ async function findOneByEmail(email) {
 		if (results.rowCount === 0) {
 			throw new NotFoundError({
 				message: "O email informado não foi encontrado no sistema.",
-				action: "Verifique se o email esta digitado corretamente.",
+				action: "Verifique se o email está digitado corretamente.",
 			})
 		}
 		return results.rows[0]
@@ -227,8 +227,8 @@ async function validateUniqueEmail(email) {
 	})
 	if (results.rowCount > 0) {
 		throw new ValidationError({
-			message: "O e-mail já está sendo utilizado.",
-			action: "Utilize outro e-mail para realizar esta operação.",
+			message: "O email informado já está sendo utilizado.",
+			action: "Utilize outro email para realizar esta operação.",
 		})
 	}
 }

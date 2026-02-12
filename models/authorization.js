@@ -6,7 +6,10 @@
  * @param {string} feature - The feature identifier to check.
  * @returns {boolean} True if the user's features include the specified feature, otherwise false.
  */
-function can(user, feature) {
+function can(user, feature, resource) {
+	if (feature === "update:user" && resource) {
+		return user.id === resource.id
+	}
 	let authorized = false
 	if (user.features.includes(feature)) {
 		authorized = true
@@ -24,8 +27,8 @@ function can(user, feature) {
  * @returns {boolean} True if the user does not have access to the feature; otherwise false.
  * @see can
  */
-function cannot(user, feature) {
-	return !can(user, feature)
+function cannot(user, feature, resource) {
+	return !can(user, feature, resource)
 }
 
 export const authorization = {

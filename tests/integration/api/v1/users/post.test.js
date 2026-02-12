@@ -78,8 +78,8 @@ describe("POST /api/v1/users", () => {
 			const response2Body = await response2.json()
 			expect(response2Body).toEqual({
 				name: "ValidationError",
-				message: "O e-mail já está sendo utilizado.",
-				action: "Utilize outro e-mail para realizar esta operação.",
+				message: "O email informado já está sendo utilizado.",
+				action: "Utilize outro email para realizar esta operação.",
 				status_code: 400,
 			})
 		})
