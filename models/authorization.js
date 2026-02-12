@@ -7,12 +7,15 @@
  * @returns {boolean} True if the user's features include the specified feature, otherwise false.
  */
 function can(user, feature, resource) {
-	if (feature === "update:user" && resource) {
-		return user.id === resource.id
-	}
 	let authorized = false
 	if (user.features.includes(feature)) {
 		authorized = true
+	}
+	if (feature === "update:user" && resource) {
+		authorized = false
+		if (user.id === resource.id || can(user, "update:user:others")) {
+			authorized = true
+		}
 	}
 	return authorized
 }

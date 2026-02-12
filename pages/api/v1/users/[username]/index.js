@@ -7,7 +7,7 @@ import { createRouter } from "next-connect"
 const router = createRouter()
 router.use(controller.injectAnonymousOrUser)
 router.get(getHandler)
-router.patch(controller.canRequest("update:user"), patchHandler)
+router.patch(patchHandler)
 export default router.handler(controller.errorHandlers)
 
 /**
@@ -47,6 +47,9 @@ async function patchHandler(request, response) {
 		})
 	}
 	const updatedUser = await user.update(username, userInputValues)
+	if (userTryingToPatch.id !== targetUser.id) {
+		return response.status(200).json(updatedUser)
+	}
 	const { features: _features, ...sanitizedUser } = updatedUser
 	return response.status(200).json(sanitizedUser)
 }
