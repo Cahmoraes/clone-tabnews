@@ -27,10 +27,8 @@ describe("POST /api/v1/users", () => {
 			const responseBody = await response.json()
 			expect(responseBody).toEqual({
 				id: responseBody.id,
-				email: "contato@curso.dev",
-				features: ["read:activation_token"],
-				password: responseBody.password,
 				username: "cahmoraes",
+				features: ["read:activation_token"],
 				created_at: responseBody.created_at,
 				updated_at: responseBody.updated_at,
 			})
@@ -140,10 +138,8 @@ describe("POST /api/v1/users", () => {
 			const user2ResponseBody = await user2Response.json()
 			expect(user2ResponseBody).toEqual({
 				id: user2ResponseBody.id,
-				email: "usuariologado@curso.dev",
-				features: ["read:activation_token"],
-				password: user2ResponseBody.password,
 				username: "usuariologado",
+				features: ["read:activation_token"],
 				created_at: user2ResponseBody.created_at,
 				updated_at: user2ResponseBody.updated_at,
 			})

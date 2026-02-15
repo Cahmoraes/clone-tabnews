@@ -15,7 +15,6 @@ describe("GET /api/v1/users/[username]", () => {
 				email: "mesmo.case@curso.dev",
 				password: "senha123",
 			})
-
 			const response2 = await fetch(
 				"http://localhost:3000/api/v1/users/MesmoCase",
 			)
@@ -23,9 +22,7 @@ describe("GET /api/v1/users/[username]", () => {
 			const response2Body = await response2.json()
 			expect(response2Body).toEqual({
 				id: response2Body.id,
-				email: "mesmo.case@curso.dev",
 				features: ["read:activation_token"],
-				password: response2Body.password,
 				username: "MesmoCase",
 				created_at: response2Body.created_at,
 				updated_at: response2Body.updated_at,
@@ -48,9 +45,7 @@ describe("GET /api/v1/users/[username]", () => {
 			const response2Body = await response2.json()
 			expect(response2Body).toEqual({
 				id: response2Body.id,
-				email: "case.diferente@curso.dev",
 				features: ["read:activation_token"],
-				password: response2Body.password,
 				username: "CaseDiferente",
 				created_at: response2Body.created_at,
 				updated_at: response2Body.updated_at,

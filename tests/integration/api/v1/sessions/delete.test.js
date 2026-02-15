@@ -56,10 +56,13 @@ describe("DELETE /api/v1/sessions", () => {
 			})
 			expect(response.status).toBe(200)
 			const responseBody = await response.json()
-			expect(responseBody).toMatchObject({
+			expect(responseBody).toEqual({
 				id: sessionObject.id,
 				token: sessionObject.token,
 				user_id: sessionObject.user_id,
+				created_at: sessionObject.created_at.toISOString(),
+				updated_at: responseBody.updated_at,
+				expires_at: responseBody.expires_at,
 			})
 			expect(
 				responseBody.expires_at < sessionObject.expires_at.toISOString(),

@@ -7,7 +7,7 @@ import { createRouter } from "next-connect"
 const router = createRouter()
 router.use(controller.injectAnonymousOrUser)
 router.get(getHandler)
-router.patch(patchHandler)
+router.patch(controller.canRequest("update:user"), patchHandler)
 export default router.handler(controller.errorHandlers)
 
 /**
@@ -20,9 +20,15 @@ export default router.handler(controller.errorHandlers)
  * @returns {Promise<void>} - A promise that resolves when the response is sent.
  */
 async function getHandler(request, response) {
+	const userTryingToGet = request.context.user
 	const username = request.query.username
 	const userFound = await user.findOneByUsername(username)
-	return response.status(200).json(userFound)
+	const secureOutputValues = authorization.filterOutput(
+		userTryingToGet,
+		"read:user",
+		userFound,
+	)
+	return response.status(200).json(secureOutputValues)
 }
 
 /**
@@ -47,9 +53,12 @@ async function patchHandler(request, response) {
 		})
 	}
 	const updatedUser = await user.update(username, userInputValues)
-	if (userTryingToPatch.id !== targetUser.id) {
-		return response.status(200).json(updatedUser)
-	}
-	const { features: _features, ...sanitizedUser } = updatedUser
-	return response.status(200).json(sanitizedUser)
+
+	const secureOutputValues = authorization.filterOutput(
+		userTryingToPatch,
+		"read:user",
+		updatedUser,
+	)
+
+	return response.status(200).json(secureOutputValues)
 }
