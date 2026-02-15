@@ -3,12 +3,15 @@
 	"version": "1.0.0",
 	"description": "Implementação do tabnews.com.br do curso.dev",
 	"main": "index.js",
-	"packageManager": "pnpm@10.29.1",
+	"packageManager": "pnpm@10.29.3",
+	"engines": {
+		"node": "24"
+	},
 	"scripts": {
 		"dev": "npm run services:up && npm run services:wait:database && npm run migrations:up && npx next dev",
 		"test": "npm run services:up && concurrently -n next,vitest --hide next -k -s command-vitest \"next dev\" \"npx vitest --run\"",
-		"test:watch": "npx vitest",
 		"posttest": "npm run services:stop",
+		"test:watch": "npx vitest",
 		"test:run": "npx vitest --run",
 		"services:up": "docker compose -f infra/compose.yaml up -d",
 		"services:down": "docker compose -f infra/compose.yaml down",
