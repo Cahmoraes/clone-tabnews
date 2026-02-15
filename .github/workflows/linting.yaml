@@ -13,7 +13,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "lts/hydrogen"
+          node-version-file: "package.json"
           cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
@@ -31,7 +31,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "lts/hydrogen"
+          node-version-file: "package.json"
           cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
