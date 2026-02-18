@@ -19,6 +19,7 @@
 		"services:stop": "docker compose -f infra/compose.yaml stop",
 		"migrations:create": "npx node-pg-migrate -m infra/migrations create",
 		"migrations:up": "npx node-pg-migrate -m infra/migrations up --envPath .env.development",
+		"migrations:up:dry": "npx node-pg-migrate -m infra/migrations --dry-run up --envPath .env.development",
 		"lint:check": "npx biome check .",
 		"lint:fix": "npx biome check --write .",
 		"migrations:down": "npx node-pg-migrate -m infra/migrations down --envPath .env.development",
