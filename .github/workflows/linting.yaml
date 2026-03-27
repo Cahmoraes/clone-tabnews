@@ -1,31 +1,24 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: Linting
 
 on: pull_request
 
 jobs:
-  prettier:
-    name: Prettier
+  biome:
+    name: Biome
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v4
         with:
-          node-version: "lts/hydrogen"
+          node-version-file: "package.json"
+          cache: "pnpm"
 
-      - run: npm ci
-      - run: npm run lint:prettier:check
-
-  eslint:
-    name: Eslint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "lts/hydrogen"
-
-      - run: npm ci
-      - run: npm run lint:eslint:check
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run lint:check
 
   commitlint:
     name: commitlint
@@ -35,9 +28,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v4
         with:
-          node-version: "lts/hydrogen"
+          node-version-file: "package.json"
+          cache: "pnpm"
 
-      - run: npm ci
-      - run: npx commitlint --from ${{ github.event.pull_request.head.sha }}~${{ github.event.pull_request.commits }} --to ${{ github.event.pull_request.head.sha }} --verbose
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec commitlint --from ${{ github.event.pull_request.head.sha }}~${{ github.event.pull_request.commits }} --to ${{ github.event.pull_request.head.sha }} --verbose

@@ -9,42 +9,33 @@ exports.shorthands = undefined
  * @returns {Promise<void> | void}
  */
 exports.up = (pgm) => {
-	pgm.createTable("sessions", {
+	pgm.createTable("user_activation_tokens", {
 		id: {
 			type: "uuid",
 			primaryKey: true,
 			default: pgm.func("gen_random_uuid()"),
 		},
-		token: {
-			type: "varchar(96)",
-			notNull: true,
-			unique: true,
+		used_at: {
+			type: "timestamptz",
+			notNull: false,
 		},
 		user_id: {
 			type: "uuid",
 			notNull: true,
 		},
-		// Why timezone? https://justatheory.com/2012/04/postgres-use-timestamptz/
-		created_at: {
-			type: "timestamptz",
-			notNull: true,
-			default: pgm.func("timezone('utc', now())"),
-		},
 		expires_at: {
 			type: "timestamptz",
-			notNull: true,
+			notNull: false,
+		},
+		created_at: {
+			type: "timestamptz",
+			notNull: false,
+			default: pgm.func("timezone('utc', now())"),
 		},
 		updated_at: {
 			type: "timestamptz",
-			notNull: true,
+			notNull: false,
 			default: pgm.func("timezone('utc', now())"),
 		},
 	})
 }
-
-/**
- * @param pgm {import('node-pg-migrate').MigrationBuilder}
- * @param run {() => void | undefined}
- * @returns {Promise<void> | void}
- */
-exports.down = false

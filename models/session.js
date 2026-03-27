@@ -1,23 +1,23 @@
-import database from "infra/database";
-import { UnauthorizedError } from "infra/errors";
-import crypto from "node:crypto";
+import crypto from "node:crypto"
+import database from "infra/database"
+import { UnauthorizedError } from "infra/errors"
 
-const EXPIRATION_IN_MILLISECONDS = 1000 * 60 * 60 * 24 * 30;
-const NUMBER_OF_BYTES = 48;
+const EXPIRATION_IN_MILLISECONDS = 1000 * 60 * 60 * 24 * 30
+const NUMBER_OF_BYTES = 48
 
 async function create(userId) {
-  try {
-    const token = crypto.randomBytes(NUMBER_OF_BYTES).toString("hex");
-    const expiresAt = new Date(Date.now() + EXPIRATION_IN_MILLISECONDS);
-    const newSession = await runInsertQuery(token, userId, expiresAt);
-    return newSession;
-  } catch (e) {
-    console.log(e);
-  }
+	try {
+		const token = crypto.randomBytes(NUMBER_OF_BYTES).toString("hex")
+		const expiresAt = new Date(Date.now() + EXPIRATION_IN_MILLISECONDS)
+		const newSession = await runInsertQuery(token, userId, expiresAt)
+		return newSession
+	} catch (e) {
+		console.log(e)
+	}
 
-  async function runInsertQuery(token, userId, expiresAt) {
-    const results = await database.query({
-      text: `
+	async function runInsertQuery(token, userId, expiresAt) {
+		const results = await database.query({
+			text: /*sql*/ `
         INSERT INTO
           sessions (token, user_id, expires_at)
         VALUES
@@ -25,10 +25,10 @@ async function create(userId) {
         RETURNING
           *
       ;`,
-      values: [token, userId, expiresAt],
-    });
-    return results.rows[0];
-  }
+			values: [token, userId, expiresAt],
+		})
+		return results.rows[0]
+	}
 }
 
 /**
@@ -39,12 +39,12 @@ async function create(userId) {
  * @returns {Promise<Object|null>} The session object if found, null otherwise.
  */
 async function findOneValidByToken(sessionToken) {
-  const sessionFound = await runSelectQuery(sessionToken);
-  return sessionFound;
+	const sessionFound = await runSelectQuery(sessionToken)
+	return sessionFound
 
-  async function runSelectQuery(sessionToken) {
-    const results = await database.query({
-      text: `
+	async function runSelectQuery(sessionToken) {
+		const results = await database.query({
+			text: /*SQL*/ `
         SELECT
           *
         FROM
@@ -55,26 +55,26 @@ async function findOneValidByToken(sessionToken) {
         LIMIT
           1
       ;`,
-      values: [sessionToken],
-    });
-    if (results.rowCount === 0) {
-      throw new UnauthorizedError({
-        message: "Usuário não possui sessão ativa.",
-        action: "Verifique se este usuário está logado e tente novamente.",
-      });
-    }
-    return results.rows[0];
-  }
+			values: [sessionToken],
+		})
+		if (results.rowCount === 0) {
+			throw new UnauthorizedError({
+				message: "Usuário não possui sessão ativa.",
+				action: "Verifique se este usuário está logado e tente novamente.",
+			})
+		}
+		return results.rows[0]
+	}
 }
 
 async function renew(sessionId) {
-  const expiresAt = new Date(Date.now() + EXPIRATION_IN_MILLISECONDS);
-  const renewedSessionObject = await runUpdateQuery(sessionId, expiresAt);
-  return renewedSessionObject;
+	const expiresAt = new Date(Date.now() + EXPIRATION_IN_MILLISECONDS)
+	const renewedSessionObject = await runUpdateQuery(sessionId, expiresAt)
+	return renewedSessionObject
 
-  async function runUpdateQuery(sessionId, expiresAt) {
-    const results = await database.query({
-      text: `
+	async function runUpdateQuery(sessionId, expiresAt) {
+		const results = await database.query({
+			text: /*SQL*/ `
         UPDATE 
           sessions 
         SET 
@@ -85,19 +85,19 @@ async function renew(sessionId) {
         RETURNING
           *
       ;`,
-      values: [sessionId, expiresAt],
-    });
-    return results.rows[0];
-  }
+			values: [sessionId, expiresAt],
+		})
+		return results.rows[0]
+	}
 }
 
 async function expireById(sessionId) {
-  const expiredSessionObject = await runUpdateQuery(sessionId);
-  return expiredSessionObject;
+	const expiredSessionObject = await runUpdateQuery(sessionId)
+	return expiredSessionObject
 
-  async function runUpdateQuery(sessionId) {
-    const results = await database.query({
-      text: `
+	async function runUpdateQuery(sessionId) {
+		const results = await database.query({
+			text: /*SQL*/ `
         UPDATE 
           sessions
         SET
@@ -108,18 +108,18 @@ async function expireById(sessionId) {
         RETURNING
           *
       ;`,
-      values: [sessionId],
-    });
-    return results.rows[0];
-  }
+			values: [sessionId],
+		})
+		return results.rows[0]
+	}
 }
 
 const session = {
-  create,
-  EXPIRATION_IN_MILLISECONDS,
-  findOneValidByToken,
-  expireById,
-  renew,
-};
+	create,
+	EXPIRATION_IN_MILLISECONDS,
+	findOneValidByToken,
+	expireById,
+	renew,
+}
 
-export default session;
+export default session

@@ -1,13 +1,14 @@
-import { createRouter } from "next-connect";
-import { controller } from "infra/controller";
-import user from "models/user";
+import { controller } from "infra/controller"
+import { ForbiddenError } from "infra/errors"
+import { authorization } from "models/authorization"
+import user from "models/user"
+import { createRouter } from "next-connect"
 
-const router = createRouter();
-
-router.get(getHandler);
-router.patch(patchHandler);
-
-export default router.handler(controller.errorHandlers);
+export default createRouter()
+	.use(controller.injectAnonymousOrUser)
+	.get(getHandler)
+	.patch(controller.canRequest("update:user"), patchHandler)
+	.handler(controller.errorHandlers)
 
 /**
  * Handles GET requests to retrieve user information by username.
@@ -19,9 +20,15 @@ export default router.handler(controller.errorHandlers);
  * @returns {Promise<void>} - A promise that resolves when the response is sent.
  */
 async function getHandler(request, response) {
-  const username = request.query.username;
-  const userFound = await user.findOneByUsername(username);
-  return response.status(200).json(userFound);
+	const userTryingToGet = request.context.user
+	const username = request.query.username
+	const userFound = await user.findOneByUsername(username)
+	const secureOutputValues = authorization.filterOutput(
+		userTryingToGet,
+		"read:user",
+		userFound,
+	)
+	return response.status(200).json(secureOutputValues)
 }
 
 /**
@@ -34,8 +41,24 @@ async function getHandler(request, response) {
  * @returns {Promise<void>} - A promise that resolves when the response is sent.
  */
 async function patchHandler(request, response) {
-  const username = request.query.username;
-  const userInputValues = request.body;
-  const updatedUser = await user.update(username, userInputValues);
-  return response.status(200).json(updatedUser);
+	const username = request.query.username
+	const userInputValues = request.body
+	const userTryingToPatch = request.context.user
+	const targetUser = await user.findOneByUsername(username)
+	if (authorization.cannot(userTryingToPatch, "update:user", targetUser)) {
+		throw new ForbiddenError({
+			message: "Você não possui permissão para atualizar outro usuário.",
+			action:
+				"Verifique se você possui a feature necessária para atualizar outro usuário.",
+		})
+	}
+	const updatedUser = await user.update(username, userInputValues)
+
+	const secureOutputValues = authorization.filterOutput(
+		userTryingToPatch,
+		"read:user",
+		updatedUser,
+	)
+
+	return response.status(200).json(secureOutputValues)
 }

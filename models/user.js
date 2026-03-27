@@ -1,6 +1,6 @@
-import database from "infra/database";
-import { ValidationError, NotFoundError } from "infra/errors";
-import password from "models/password";
+import database from "infra/database"
+import { NotFoundError, ValidationError } from "infra/errors"
+import password from "models/password"
 
 /**
  * Finds a user by their ID in the database.
@@ -11,12 +11,12 @@ import password from "models/password";
  * @async
  */
 async function findOneById(id) {
-  const userFound = await runSelectQuery(id);
-  return userFound;
+	const userFound = await runSelectQuery(id)
+	return userFound
 
-  async function runSelectQuery(id) {
-    const results = await database.query({
-      text: `
+	async function runSelectQuery(id) {
+		const results = await database.query({
+			text: /*SQL*/ `
         SELECT 
           *
         FROM 
@@ -26,16 +26,16 @@ async function findOneById(id) {
         LIMIT
           1
         ;`,
-      values: [id],
-    });
-    if (results.rowCount === 0) {
-      throw new NotFoundError({
-        message: "O id informado não foi encontrado no sistema.",
-        action: "Verifique se o id esta digitado corretamente.",
-      });
-    }
-    return results.rows[0];
-  }
+			values: [id],
+		})
+		if (results.rowCount === 0) {
+			throw new NotFoundError({
+				message: "O id informado não foi encontrado no sistema.",
+				action: "Verifique se o id está digitado corretamente.",
+			})
+		}
+		return results.rows[0]
+	}
 }
 
 /**
@@ -43,12 +43,12 @@ async function findOneById(id) {
  * @param {String} username
  */
 async function findOneByUsername(username) {
-  const userFound = await runSelectQuery(username);
-  return userFound;
+	const userFound = await runSelectQuery(username)
+	return userFound
 
-  async function runSelectQuery(username) {
-    const results = await database.query({
-      text: `
+	async function runSelectQuery(username) {
+		const results = await database.query({
+			text: /*SQL*/ `
         SELECT 
           *
         FROM 
@@ -58,16 +58,16 @@ async function findOneByUsername(username) {
         LIMIT
           1
         ;`,
-      values: [username],
-    });
-    if (results.rowCount === 0) {
-      throw new NotFoundError({
-        message: "O username informado não foi encontrado no sistema.",
-        action: "Verifique se o username esta digitado corretamente.",
-      });
-    }
-    return results.rows[0];
-  }
+			values: [username],
+		})
+		if (results.rowCount === 0) {
+			throw new NotFoundError({
+				message: "O username informado não foi encontrado no sistema.",
+				action: "Verifique se o username está digitado corretamente.",
+			})
+		}
+		return results.rows[0]
+	}
 }
 
 /**
@@ -75,12 +75,12 @@ async function findOneByUsername(username) {
  * @param {String} email
  */
 async function findOneByEmail(email) {
-  const userFound = await runSelectQuery(email);
-  return userFound;
+	const userFound = await runSelectQuery(email)
+	return userFound
 
-  async function runSelectQuery(email) {
-    const results = await database.query({
-      text: `
+	async function runSelectQuery(email) {
+		const results = await database.query({
+			text: /*SQL*/ `
         SELECT 
           *
         FROM 
@@ -90,43 +90,49 @@ async function findOneByEmail(email) {
         LIMIT
           1
         ;`,
-      values: [email],
-    });
-    if (results.rowCount === 0) {
-      throw new NotFoundError({
-        message: "O email informado não foi encontrado no sistema.",
-        action: "Verifique se o email esta digitado corretamente.",
-      });
-    }
-    return results.rows[0];
-  }
+			values: [email],
+		})
+		if (results.rowCount === 0) {
+			throw new NotFoundError({
+				message: "O email informado não foi encontrado no sistema.",
+				action: "Verifique se o email está digitado corretamente.",
+			})
+		}
+		return results.rows[0]
+	}
 }
 
 async function create(userInputValues) {
-  await validateUniqueUsername(userInputValues.username);
-  await validateUniqueEmail(userInputValues.email);
-  await hashPasswordInObject(userInputValues);
-  const newUser = await runInsertQuery(userInputValues);
-  return newUser;
+	await validateUniqueUsername(userInputValues.username)
+	await validateUniqueEmail(userInputValues.email)
+	await hashPasswordInObject(userInputValues)
+	injectDefaultFeaturesInObject(userInputValues)
+	const newUser = await runInsertQuery(userInputValues)
+	return newUser
 
-  async function runInsertQuery(userInputValues) {
-    const result = await database.query({
-      text: `
+	async function runInsertQuery(userInputValues) {
+		const result = await database.query({
+			text: /*SQL*/ `
         INSERT INTO 
-          users (username, email, password) 
+          users (username, email, password, features) 
         VALUES 
-          ($1, $2, $3)
+          ($1, $2, $3, $4)
         RETURNING
           *
         ;`,
-      values: [
-        userInputValues.username,
-        userInputValues.email,
-        userInputValues.password,
-      ],
-    });
-    return result.rows[0];
-  }
+			values: [
+				userInputValues.username,
+				userInputValues.email,
+				userInputValues.password,
+				userInputValues.features,
+			],
+		})
+		return result.rows[0]
+	}
+
+	function injectDefaultFeaturesInObject(userInputValues) {
+		userInputValues.features = ["read:activation_token"]
+	}
 }
 
 /**
@@ -141,29 +147,29 @@ async function create(userInputValues) {
  * @param {UserInputValues} userInputValues
  */
 async function update(username, userInputValues) {
-  const currentUser = await findOneByUsername(username);
-  if (hasProperty("username")) {
-    await validateUniqueUsername(userInputValues.username);
-  }
-  if (hasProperty("email")) {
-    await validateUniqueEmail(userInputValues.email);
-  }
-  if (hasProperty("password")) {
-    await hashPasswordInObject(userInputValues);
-  }
-  const userWithNewValues = {
-    ...currentUser,
-    ...userInputValues,
-  };
-  return runUpdateQuery(userWithNewValues);
+	const currentUser = await findOneByUsername(username)
+	if (hasProperty("username")) {
+		await validateUniqueUsername(userInputValues.username)
+	}
+	if (hasProperty("email")) {
+		await validateUniqueEmail(userInputValues.email)
+	}
+	if (hasProperty("password")) {
+		await hashPasswordInObject(userInputValues)
+	}
+	const userWithNewValues = {
+		...currentUser,
+		...userInputValues,
+	}
+	return runUpdateQuery(userWithNewValues)
 
-  function hasProperty(property) {
-    return userInputValues && Reflect.has(userInputValues, property);
-  }
+	function hasProperty(property) {
+		return userInputValues && Reflect.has(userInputValues, property)
+	}
 
-  async function runUpdateQuery(userWithNewValues) {
-    const result = await database.query({
-      text: `
+	async function runUpdateQuery(userWithNewValues) {
+		const result = await database.query({
+			text: /*SQL*/ `
         UPDATE
           users
         SET
@@ -176,20 +182,20 @@ async function update(username, userInputValues) {
         RETURNING
           *
         ;`,
-      values: [
-        userWithNewValues.id,
-        userWithNewValues.username,
-        userWithNewValues.email,
-        userWithNewValues.password,
-      ],
-    });
-    return result.rows[0];
-  }
+			values: [
+				userWithNewValues.id,
+				userWithNewValues.username,
+				userWithNewValues.email,
+				userWithNewValues.password,
+			],
+		})
+		return result.rows[0]
+	}
 }
 
 async function validateUniqueUsername(username) {
-  const results = await database.query({
-    text: `
+	const results = await database.query({
+		text: /*SQL*/ `
       SELECT 
         username
       FROM 
@@ -197,19 +203,19 @@ async function validateUniqueUsername(username) {
       WHERE 
         LOWER(username) = LOWER($1)
       ;`,
-    values: [username],
-  });
-  if (results.rowCount > 0) {
-    throw new ValidationError({
-      message: "O username informado já está sendo utilizado.",
-      action: "Utilize outro username para realizar esta operação.",
-    });
-  }
+		values: [username],
+	})
+	if (results.rowCount > 0) {
+		throw new ValidationError({
+			message: "O username informado já está sendo utilizado.",
+			action: "Utilize outro username para realizar esta operação.",
+		})
+	}
 }
 
 async function validateUniqueEmail(email) {
-  const results = await database.query({
-    text: `
+	const results = await database.query({
+		text: /*SQL*/ `
       SELECT 
         email
       FROM 
@@ -217,27 +223,75 @@ async function validateUniqueEmail(email) {
       WHERE 
         LOWER(email) = LOWER($1)
       ;`,
-    values: [email],
-  });
-  if (results.rowCount > 0) {
-    throw new ValidationError({
-      message: "O e-mail já está sendo utilizado.",
-      action: "Utilize outro e-mail para realizar esta operação.",
-    });
-  }
+		values: [email],
+	})
+	if (results.rowCount > 0) {
+		throw new ValidationError({
+			message: "O email informado já está sendo utilizado.",
+			action: "Utilize outro email para realizar esta operação.",
+		})
+	}
 }
 
 async function hashPasswordInObject(userInputValues) {
-  const hashedPassword = await password.hash(userInputValues.password);
-  userInputValues.password = hashedPassword;
+	const hashedPassword = await password.hash(userInputValues.password)
+	userInputValues.password = hashedPassword
+}
+
+async function setFeatures(userId, features) {
+	const updatedUser = await runUpdateQuery(userId, features)
+	return updatedUser
+
+	async function runUpdateQuery(userId, features) {
+		const results = await database.query({
+			text: /*sql*/ `
+        UPDATE
+          users
+        SET
+          features = $2,
+          updated_at = timezone('utc', now())
+        WHERE
+          id = $1
+        RETURNING
+          *
+      `,
+			values: [userId, features],
+		})
+		return results.rows[0]
+	}
+}
+
+async function addFeatures(userId, features) {
+	const updatedUser = await runUpdateQuery(userId, features)
+	return updatedUser
+
+	async function runUpdateQuery(userId, features) {
+		const results = await database.query({
+			text: /*sql*/ `
+        UPDATE
+          users
+        SET
+          features = array_cat(features, $2),
+          updated_at = timezone('utc', now())
+        WHERE
+          id = $1
+        RETURNING
+          *
+      `,
+			values: [userId, features],
+		})
+		return results.rows[0]
+	}
 }
 
 const user = {
-  create,
-  findOneById,
-  findOneByUsername,
-  findOneByEmail,
-  update,
-};
+	create,
+	findOneById,
+	findOneByUsername,
+	findOneByEmail,
+	update,
+	setFeatures,
+	addFeatures,
+}
 
-export default user;
+export default user

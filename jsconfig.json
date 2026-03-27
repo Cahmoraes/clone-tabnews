@@ -1,6 +1,6 @@
 {
-  "compilerOptions": {
-    "baseUrl": ".",
-    "types": ["vitest/globals"]
-  }
+	"compilerOptions": {
+		"baseUrl": ".",
+		"types": ["vitest/globals"]
+	}
 }
