@@ -1,3 +1,4 @@
+import { webserver } from "infra/webserver"
 import session from "models/session"
 import setCookieParser from "set-cookie-parser"
 import orchestrator from "tests/orchestrator"
@@ -16,8 +17,8 @@ describe("GET /api/v1/user", () => {
 				username: "UserWithValidSession",
 			})
 			const activatedUser = await orchestrator.activateUser(createdUser)
-			const sessionObject = await orchestrator.createSession(createdUser.id)
-			const response = await fetch("http://localhost:3000/api/v1/user", {
+			const sessionObject = await orchestrator.createSession(createdUser)
+			const response = await fetch(`${webserver.origin}/api/v1/user`, {
 				headers: {
 					Cookie: `session_id=${sessionObject.token}`,
 				},
@@ -64,13 +65,14 @@ describe("GET /api/v1/user", () => {
 				maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
 				path: "/",
 				httpOnly: true,
+				sameSite: "Lax",
 			})
 		})
 
 		test("With nonexistent session", async () => {
 			const nonexistentToken =
 				"d9194bcffeccce76e6fc9fd3b47256613bb73eeac61932679dd24244d867be086ddcec95d8691bba0dac68e7312715e2"
-			const response = await fetch("http://localhost:3000/api/v1/user", {
+			const response = await fetch(`${webserver.origin}/api/v1/user`, {
 				headers: {
 					Cookie: `session_id=${nonexistentToken}`,
 				},
@@ -93,6 +95,7 @@ describe("GET /api/v1/user", () => {
 				maxAge: -1,
 				path: "/",
 				httpOnly: true,
+				sameSite: "Lax",
 			})
 		})
 
@@ -103,9 +106,9 @@ describe("GET /api/v1/user", () => {
 			const createdUser = await orchestrator.createUser({
 				username: "UserWithExpiredSession",
 			})
-			const sessionObject = await orchestrator.createSession(createdUser.id)
+			const sessionObject = await orchestrator.createSession(createdUser)
 			vi.useRealTimers()
-			const response = await fetch("http://localhost:3000/api/v1/user", {
+			const response = await fetch(`${webserver.origin}/api/v1/user`, {
 				headers: {
 					Cookie: `session_id=${sessionObject.token}`,
 				},
@@ -128,6 +131,7 @@ describe("GET /api/v1/user", () => {
 				maxAge: -1,
 				path: "/",
 				httpOnly: true,
+				sameSite: "Lax",
 			})
 		})
 	})

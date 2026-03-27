@@ -4,12 +4,10 @@ import { authorization } from "models/authorization"
 import user from "models/user"
 import { createRouter } from "next-connect"
 
-const router = createRouter()
-
-router.use(controller.injectAnonymousOrUser)
-router.post(controller.canRequest("create:user"), postHandler)
-
-export default router.handler(controller.errorHandlers)
+export default createRouter()
+	.use(controller.injectAnonymousOrUser)
+	.post(controller.canRequest("create:user"), postHandler)
+	.handler(controller.errorHandlers)
 
 async function postHandler(request, response) {
 	const userTryingToPost = request.context.user

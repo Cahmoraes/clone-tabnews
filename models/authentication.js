@@ -13,7 +13,7 @@ import user from "./user"
  * @throws {UnauthorizedError} Thrown when the email doesn't exist or the password doesn't match.
  * @throws {Error} Propagates any other errors that might occur during the authentication process.
  */
-async function getAuthenticatedUser(providedEmail, providedPassword) {
+async function getUser(providedEmail, providedPassword) {
 	try {
 		const storedUser = await findUserByEmail(providedEmail)
 		await validatePassword(providedPassword, storedUser.password)
@@ -57,7 +57,7 @@ async function getAuthenticatedUser(providedEmail, providedPassword) {
 }
 
 const authentication = {
-	getAuthenticatedUser,
+	getUser,
 }
 
 export default authentication

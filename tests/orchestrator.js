@@ -1,6 +1,7 @@
 import { faker } from "@faker-js/faker"
 import retry from "async-retry"
 import database from "infra/database"
+import { webserver } from "infra/webserver"
 import { activation } from "models/activation"
 import migrator from "models/migrator"
 import session from "models/session"
@@ -19,7 +20,7 @@ async function waitForAllServices() {
 		})
 
 		async function fetchStatusPage() {
-			const response = await fetch("http://localhost:3000/api/v1/status")
+			const response = await fetch(`${webserver.origin}/api/v1/status`)
 			if (response.status !== 200) throw new Error()
 		}
 	}
@@ -99,8 +100,8 @@ async function createUser(userObject = {}) {
  * @param {string} userId - The ID of the user for whom to create a session
  * @returns {Promise<Object>} A promise that resolves to the created session object
  */
-async function createSession(userId) {
-	return session.create(userId)
+async function createSession(userObject) {
+	return session.create(userObject.id)
 }
 
 /**

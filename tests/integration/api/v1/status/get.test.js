@@ -1,3 +1,4 @@
+import { webserver } from "infra/webserver"
 import orchestrator from "tests/orchestrator"
 
 beforeAll(async () => {
@@ -9,7 +10,7 @@ beforeAll(async () => {
 describe("GET /api/v1/status", () => {
 	describe("Anonymous user", () => {
 		test("Retrieving current system status", async () => {
-			const response = await fetch("http://localhost:3000/api/v1/status")
+			const response = await fetch(`${webserver.origin}/api/v1/status`)
 			expect(response.status).toBe(200)
 			expect(response.ok).toBe(true)
 			const responseBody = await response.json()
@@ -24,6 +25,26 @@ describe("GET /api/v1/status", () => {
 		})
 	})
 
+	describe("Default user", () => {
+		test("Retrieving current system status", async () => {
+			const createdUser = await orchestrator.createUser()
+			const activatedUser = await orchestrator.activateUser(createdUser)
+			const privilegedUserSession =
+				await orchestrator.createSession(activatedUser)
+
+			const response = await fetch(`${webserver.origin}/api/v1/status`, {
+				headers: {
+					Cookie: `session_id=${privilegedUserSession.token}`,
+				},
+			})
+			expect(response.status).toBe(200)
+
+			const responseBody = await response.json()
+
+			expect(responseBody.dependencies.database).not.toHaveProperty("version")
+		})
+	})
+
 	describe("Privileged user", () => {
 		test("With `read:status:all`", async () => {
 			const privilegedUser = await orchestrator.createUser()
@@ -31,10 +52,10 @@ describe("GET /api/v1/status", () => {
 				await orchestrator.activateUser(privilegedUser)
 			await orchestrator.addFeaturesToUser(privilegedUser, ["read:status:all"])
 			const privilegedUserSession = await orchestrator.createSession(
-				activatedPrivilegedUser.id,
+				activatedPrivilegedUser,
 			)
 
-			const response = await fetch("http://localhost:3000/api/v1/status", {
+			const response = await fetch(`${webserver.origin}/api/v1/status`, {
 				headers: {
 					Cookie: `session_id=${privilegedUserSession.token}`,
 				},
